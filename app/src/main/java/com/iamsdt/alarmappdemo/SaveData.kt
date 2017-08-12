@@ -51,8 +51,5 @@ class SaveData{
 
         am.setRepeating(AlarmManager.RTC_WAKEUP,calender.timeInMillis,
                 AlarmManager.INTERVAL_DAY,pi)
-
-
-
     }
 }

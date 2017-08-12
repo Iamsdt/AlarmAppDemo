@@ -1,17 +1,18 @@
 package com.iamsdt.alarmappdemo
 
-import android.content.Context
+import android.app.DialogFragment
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.pop_time.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -20,10 +21,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        val saveData=SaveData(applicationContext)
+        val saveData = SaveData(applicationContext)
 
-        tvShowTime.text= saveData.getHour().toString() + ":" + saveData.getMinute().toString()
+        val str: String = "${saveData.getHour()} : ${saveData.getMinute()}"
+        tvShowTime.text = str
 
+        buSetTime.setOnClickListener({
+            val popTime = Popup()
+            val fm = fragmentManager
+            popTime.show(fm, "Select time")
+        })
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -36,6 +43,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+    }
+
+    fun SetTime(Hours: Int, Minute: Int) {
+
+        val time = "$Hours:$Minute"
+
+        tvShowTime.text = time
+
+        val saveData = SaveData(applicationContext)
+        saveData.SaveData(Hours, Minute)
+        saveData.setAlarm()
+
+
     }
 
     override fun onBackPressed() {
@@ -88,4 +108,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
+}
+
+class Popup : DialogFragment() {
+
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
+        val myView = inflater!!.inflate(R.layout.pop_time, container, false)
+
+        buDone.setOnClickListener({
+            //Code here
+            val ma = activity as MainActivity
+            if (Build.VERSION.SDK_INT >= 23) {
+                ma.SetTime(tp1.hour, tp1.minute)
+            } else {
+                ma.SetTime(tp1.currentHour, tp1.currentMinute)
+            }
+
+            this.dismiss()
+        })
+
+
+        return myView
+    }
+
 }
